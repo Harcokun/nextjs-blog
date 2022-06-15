@@ -1,11 +1,46 @@
+import React, { useState } from "react";
 import Head from "next/head";
 import Layout, { siteTitle } from "../components/layout";
 import utilStyles from "../styles/utils.module.css";
 import { getSortedPostsData } from "../lib/posts";
 import Link from "next/link";
 import Date from "../components/date";
+import Login from "./login";
+//import useToken from "../components/useToken";
+
+function useToken() {
+
+  const getToken = () => {
+    const tokenString = localStorage.getItem('token');
+    const userToken = JSON.parse(tokenString);
+    return userToken?.token
+  };
+
+  const [token, setToken] = useState(getToken());
+
+  const saveToken = userToken => {
+    localStorage.setItem('token', JSON.stringify(userToken));
+    setToken(userToken.token);
+  };
+
+  return {
+    setToken: saveToken,
+    token
+  }
+}
 
 export default function Home({ allPostsData }) {
+  const { token, setToken } = useToken();
+
+  if(!token) {
+    return <Login setToken={setToken} />
+  }
+  // if (typeof window !== "undefined") {
+  //   console.log("Rendering on browser or client");
+  // } else {
+  //   console.log("Rendering on server");
+  // }
+
   return (
     <Layout home>
       <Head>

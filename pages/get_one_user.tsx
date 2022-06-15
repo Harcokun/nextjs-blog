@@ -26,7 +26,7 @@ const GetOneUSer = () => {
           console.log(data);
           setUser((user) => ({ ...user, ...data }));
           setCallUser(true);
-          setErrorCode(0);
+          setErrorCode(200);
           console.log(user);
         })
         .catch(function (error) {
