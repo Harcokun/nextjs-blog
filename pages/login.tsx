@@ -1,32 +1,37 @@
 import axios from "axios";
 import React, { useState } from "react";
-//import "./login.css";
+import { useRouter } from 'next/router';
 
-interface LoginProps {
-  setToken: (token: any) => void;
-}
-
-async function loginUser(credentials) {
-  return fetch("http://localhost:8000/api/auth/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(credentials),
-  }).then((data) => data.json());
-}
-
-const Login: React.FC<LoginProps> = ({ setToken }) => {
+const Login = () => {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [token, setToken] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const token = await loginUser({
-      email,
-      password,
-    });
-    setToken(token);
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    axios({
+      method: "post",
+      url: "http://localhost:8000/api/auth/login",
+      data: JSON.stringify({ email, password }),
+      headers: { "Content-Type": "application/json" },
+    })
+      .then(function (response) {
+        setToken(response.data.token);
+        console.log(`Response Token: ${response.data.token}`);
+        //console.log(`Token: ${token}`);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("token", token);
+        }
+        router.push('/');
+      })
+      .catch(function (error) {
+        if (error.response) {
+          setErrorMsg(error.response.status);
+          console.log(`Reponse Error Status: ${error.response.status}`);
+        }
+      });
   };
 
   return (
@@ -62,6 +67,7 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
           </button>
         </div>
       </form>
+        {errorMsg == "400" && (<div>Unauthorized: Email or password is incorrect.</div>)}
     </div>
   );
 };
