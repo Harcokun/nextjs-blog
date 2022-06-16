@@ -17,24 +17,28 @@ const GetOneUSer = () => {
   const [hasInput, setInputExisted] = useState(false);
   const [callUser, setCallUser] = useState(false);
   const [errorCode, setErrorCode] = useState(0);
+
+  // const token = localStorage.getItem("token");
+  // console.log(token);
+
   const handleClick = () => {
     console.log("The button is clicked");
-      axios
-        .get("http://127.0.0.1:8000/api/users/" + id)
-        .then(function (response) {
-          const data = response.data;
-          console.log(data);
-          setUser((user) => ({ ...user, ...data }));
-          setCallUser(true);
-          setErrorCode(200);
-          console.log(user);
-        })
-        .catch(function (error) {
-          if(error.response) {
-            console.log(error.response);
-            setErrorCode(error.response.status);
-          }
-        })
+    axios
+      .get("http://127.0.0.1:8000/api/users/" + id)
+      .then(function (response) {
+        const data = response.data;
+        console.log(data);
+        setUser((user) => ({ ...user, ...data }));
+        setCallUser(true);
+        setErrorCode(200);
+        console.log(user);
+      })
+      .catch(function (error) {
+        if (error.response) {
+          console.log(error.response);
+          setErrorCode(error.response.status);
+        }
+      });
   };
 
   return (
@@ -51,8 +55,8 @@ const GetOneUSer = () => {
               type="text"
               value={id}
               onChange={(e) => {
-                setId(e.target.value)
-                setInputExisted(true)
+                setId(e.target.value);
+                setInputExisted(true);
               }}
             />
           </label>
