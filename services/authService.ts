@@ -3,6 +3,25 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 
 export class AuthService {
+
+  public get isLogin(): boolean {
+    this.setToken(localStorage.getItem("token")); // Really I can't use window on server side??? TTTT TTTT
+    console.log(`Get token from authService.isLogin(): ${this.token}`);
+    if (this.token && this.token != "null") {
+      return true;
+    }
+    return false;
+  }
+
+  public get token(): string {
+    const token = localStorage.getItem("token");
+    return token;
+  }
+
+  public setToken(token): void {
+    localStorage.setItem("token", token);
+  }
+
   public async login(email, password) {
     var token = "";
     var errorMsg = "";
@@ -18,7 +37,7 @@ export class AuthService {
         //console.log(`Response Token: ${response.data.token}`);
         //console.log(`Token: ${token}`);
         //if (typeof window !== "undefined") {
-        window.localStorage.setItem("token", token);
+        localStorage.setItem("token", token);
         //console.log(`token from authService login: ${token}`);
         //return [token, errorMsg];
         //}
@@ -32,15 +51,15 @@ export class AuthService {
         //return [token, errorMsg];
       });
 
-      return [token, errorMsg];
+    return [token, errorMsg];
   }
 
   public logout() {
-    let token = window.localStorage.getItem("token");
-    let errorMsg = "";
+    var token = localStorage.getItem("token");
+    var errorMsg = "";
     console.log(`Token in logout 1st stage: ${token}`);
-    window.localStorage.removeItem("token");
-    //window.localStorage.setItem("token", null);
+    localStorage.removeItem("token");
+    //localStorage.setItem("token", null);
 
     axios
       .post("http://localhost:8000/api/auth/logout", {
@@ -54,7 +73,7 @@ export class AuthService {
         console.log(`Response Token: ${response.data.token}`);
         //console.log(`Token: ${token}`);
         //if (typeof window !== "undefined") {
-        window.localStorage.removeItem("token");
+        localStorage.removeItem("token");
         //}
       })
       .catch(function (error) {

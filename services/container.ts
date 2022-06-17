@@ -1,5 +1,7 @@
+import React from "react";
 import { AuthService } from "./authService";
 import { UserService } from "./userService";
 
-export const authService = new AuthService();
-export const userService = new UserService(authService);
+const authService = new AuthService();
+const userService = new UserService(authService);
+export const container = {authService, userService};

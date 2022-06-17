@@ -8,36 +8,42 @@ import Date from "../components/date";
 import Login from "./login";
 import { useRouter } from "next/router";
 import axios from "axios";
-import { authService } from "../services/container";
+import { useContainer } from "../services/containerProvider";
+//import { authService } from "../services/container";
 //import useToken from "../components/useToken";
 
 export default function Home({ allPostsData }) {
-  const [token, setToken] = useState("");
+  //const [token, setToken] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [hasError, setErrorExisted] = useState(false);
   const router = useRouter();
+  const { authService } = useContainer();
 
-  useEffect(() => {
-    //if (typeof window !== "undefined") {
-      setToken(window.localStorage.getItem("token"));
-      //token = localStorage.getItem("token");
-    //}
-    console.log(`Token at 1st state: ${token}`);
-    //console.log(`Is token empty?: ${token == null || token == ""}`);
-  }, []);
+  // useEffect(() => {
+  //   //if (typeof window !== "undefined") {
+  //     authService.setToken(window.localStorage.getItem("token"));
+  //     //token = localStorage.getItem("token");
+  //   //}
+  //   //console.log(`Is token empty?: ${token == null || token == ""}`);
+  //   console.log(`Token at 1st state: ${authService.token}`);
 
-  if (!token) {
+  // }, []);
+
+  const isLogin = authService.isLogin;
+  console.log(`Token at 1st state: ${authService.token}`);
+
+  if (!isLogin) {
     return <Login />;
   }
 
   const handleLogout = () => {
-    console.log(`Token used in logout: ${token}`);
+    console.log(`Token used in logout: ${authService.token}`);
     setErrorMsg(authService.logout());
     if(errorMsg) {
       setErrorExisted(true);
     }
-    if (!hasError && typeof window !== "undefined") {
-      console.log(`Token at logout state: ${token}`);
+    if (!hasError) {
+      console.log(`Token at logout state: ${authService.token}`);
       location.reload();
     }
   };
