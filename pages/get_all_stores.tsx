@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import Layout, { siteTitle } from "../components/layout";
 import { useRouter } from "next/router";
 import axios from "axios";
-import { userService } from "../services/container";
+import { useContainer } from "../services/containerProvider";
+import Login from "./login";
 
 const GetAllStores = () => {
   //console.log(userService.getUserName);
@@ -10,18 +11,11 @@ const GetAllStores = () => {
   const router = useRouter();
   const [errorCode, setErrorCode] = useState("");
   const [hasError, setErrorExisted] = useState(false);
-  //const [token, setToken] = useState("");
-  let token = "";
+  const { authService, storeService } = useContainer();
 
-  if (typeof window !== "undefined" && !localStorage.getItem("token")) {
-    router.push("/login");
+  if (!authService.isLogin) {
+    return <Login />;
   }
-  if (typeof window !== "undefined") {
-    //setToken(localStorage.getItem("token"));
-    token = localStorage.getItem("token");
-  }
-
-  console.log(`Token: ${token}`);
 
   //var storeArray = [];
   const [stores, setStores] = useState([]);
@@ -32,7 +26,7 @@ const GetAllStores = () => {
     await axios
       .get("http://127.0.0.1:8000/api/stores/", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${authService.token}`,
           Accept: "application/json",
         },
       })

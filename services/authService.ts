@@ -6,7 +6,7 @@ export class AuthService {
 
   public get isLogin(): boolean {
     this.setToken(localStorage.getItem("token")); // Really I can't use window on server side??? TTTT TTTT
-    console.log(`Get token from authService.isLogin(): ${this.token}`);
+    //console.log(`Get token from authService.isLogin(): ${this.token}`);
     if (this.token && this.token != "null") {
       return true;
     }
@@ -54,10 +54,34 @@ export class AuthService {
     return [token, errorMsg];
   }
 
+  public async getMe() {
+    var token = localStorage.getItem("token");
+    var data = null;
+    var errorMsg = "";
+    await axios
+      .get(("http://127.0.0.1:8000/api/auth/me"), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      })
+      .then(function (response) {
+        data = response.data;
+        //console.log(data);
+      })
+      .catch(function (error) {
+        if (error.response) {
+          //console.log(error.response);
+          errorMsg = String(error.response.status);
+        }
+      });
+    return [data, errorMsg];
+  }
+
   public logout() {
     var token = localStorage.getItem("token");
     var errorMsg = "";
-    console.log(`Token in logout 1st stage: ${token}`);
+    //console.log(`Token in logout 1st stage: ${token}`);
     localStorage.removeItem("token");
     //localStorage.setItem("token", null);
 
@@ -70,7 +94,7 @@ export class AuthService {
       })
       .then(function (response) {
         //token = null;
-        console.log(`Response Token: ${response.data.token}`);
+        //console.log(`Response Token: ${response.data.token}`);
         //console.log(`Token: ${token}`);
         //if (typeof window !== "undefined") {
         localStorage.removeItem("token");
@@ -79,17 +103,10 @@ export class AuthService {
       .catch(function (error) {
         if (error.response) {
           errorMsg = error.response.status;
-          console.log(`Reponse Error Status: ${error.response.status}`);
-          if (errorMsg == "401") {
-            alert("Unauthorized.");
-          }
+          //console.log(`Reponse Error Status: ${error.response.status}`);
         }
       });
     return errorMsg;
   }
 
-  //getter
-  public get getUserName(): any {
-    return { name: "Lumine" };
-  }
 }

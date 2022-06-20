@@ -6,12 +6,9 @@ import Layout from "../components/layout";
 import { useContainer } from "../services/containerProvider";
 
 const Login = () => {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [token, setToken] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
-  const {authService} = useContainer();
+  const { authService } = useContainer();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -20,12 +17,12 @@ const Login = () => {
       email,
       password
     );
-    console.log(`login_token: ${login_token}`);
-    setToken(login_token);
-    setErrorMsg(login_errorMsg);
-    //console.log(`token from login: ${token}`);
+    //console.log(`login_token: ${login_token}`);
     if (login_token) {
       location.reload();
+    }
+    if (login_errorMsg == "401") {
+      alert("Unauthorized.");
     }
   };
 

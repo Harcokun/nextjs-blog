@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Layout, { siteTitle } from "../components/layout";
 import axios from "axios";
+import { useContainer } from "../services/containerProvider";
+import Login from "./login";
 
 const GetOneUSer = () => {
   const [user, setUser] = useState({
@@ -16,29 +18,30 @@ const GetOneUSer = () => {
   const [id, setId] = useState("0");
   const [hasInput, setInputExisted] = useState(false);
   const [callUser, setCallUser] = useState(false);
-  const [errorCode, setErrorCode] = useState(0);
+  const [errorCode, setErrorCode] = useState("");
+  const { authService, userService } = useContainer();
 
   // const token = localStorage.getItem("token");
   // console.log(token);
 
-  const handleClick = () => {
-    console.log("The button is clicked");
-    axios
-      .get("http://127.0.0.1:8000/api/users/" + id)
-      .then(function (response) {
-        const data = response.data;
-        console.log(data);
-        setUser((user) => ({ ...user, ...data }));
-        setCallUser(true);
-        setErrorCode(200);
-        console.log(user);
-      })
-      .catch(function (error) {
-        if (error.response) {
-          console.log(error.response);
-          setErrorCode(error.response.status);
-        }
-      });
+  if (!authService.isLogin) {
+    return <Login />;
+  }
+
+  const handleClick = async () => {
+    var data = null;
+    await userService.getOneUser(id).then((result) => {
+      data = result[0];
+      setErrorCode(result[1]);
+    });
+    //console.log(errorCode);
+    if (!errorCode) {
+      setUser((user) => ({ ...user, ...data }));
+      //console.log(`user: ${user.id}`);
+      setCallUser(true);
+    } else {
+      setCallUser(false);
+    }
   };
 
   return (
@@ -56,7 +59,11 @@ const GetOneUSer = () => {
               value={id}
               onChange={(e) => {
                 setId(e.target.value);
-                setInputExisted(true);
+                if (id != null) {
+                  setInputExisted(true);
+                } else {
+                  setInputExisted(false);
+                }
               }}
             />
           </label>
@@ -71,14 +78,14 @@ const GetOneUSer = () => {
         >
           GET User
         </button>
-        {callUser && errorCode == 0 && (
+        {callUser && !errorCode && (
           <div>
             Hello, {user.firstname} {user.lastname}
           </div>
         )}
-        {errorCode == 400 && <div>Error: Bad Request</div>}
-        {errorCode == 401 && <div>Error: Unauthorized, please log in.</div>}
-        {errorCode == 404 && <div>Error: Cannot find this user</div>}
+        {errorCode == "400" && <div>Error: Bad Request</div>}
+        {errorCode == "401" && <div>Error: Unauthorized, please log in.</div>}
+        {errorCode == "404" && <div>Error: Cannot find this user</div>}
       </div>
     </Layout>
   );
