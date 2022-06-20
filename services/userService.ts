@@ -40,13 +40,13 @@ export class UserService {
       await this.authService.getMe().then((result) => {
         if (!result[1]) {
           fullname = result[0].firstname + " " + result[0].lastname;
-          console.log(`${fullname}`);
+          //console.log(`${fullname}`);
         } else {
           throw alert(`Error ${result[1]}: Unauthenticated`);
         }
       });
     }
-    console.log(`Fullname in GetUserName: ${fullname}`);
+    //console.log(`Fullname in GetUserName: ${fullname}`);
     return fullname;
   }
 }

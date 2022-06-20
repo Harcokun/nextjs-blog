@@ -18,34 +18,16 @@ const GetAllStores = () => {
   }
 
   //var storeArray = [];
-  const [stores, setStores] = useState([]);
+  const [stores, setStores] = useState<any[]>([]);
 
   const handleClick = async () => {
     //console.log("The button is clicked");
-
-    await axios
-      .get("http://127.0.0.1:8000/api/stores/", {
-        headers: {
-          Authorization: `Bearer ${authService.token}`,
-          Accept: "application/json",
-        },
-      })
-      .then(function (response) {
-        //storeArray = response.data;
-        console.log(response.data);
-        setStores(JSON.parse(response.data));
-        setErrorExisted(false);
-        console.log(stores);
-      })
-      .catch(function (error) {
-        if (error.response) {
-          setErrorCode(error.response.status);
-          setErrorExisted(true);
-          console.log(`Error Code: ${error.response.status}`);
-        }
-      });
+    const allStores = await storeService.getAllStores();
+    //console.log(`allStores: ${JSON.stringify(allStores[0])}`);
+    setStores(allStores[0]);
   };
 
+  console.log(`Stores after axios: ${stores}`);
   return (
     <Layout home>
       <div className="text-center mb-4 font-bold">
@@ -61,12 +43,29 @@ const GetAllStores = () => {
         </button>
       </div>
 
-      <ul>
-        {stores.map((store) => {
-          console.log(``);
-          return <li>{store.id}</li>;
-        })}
-      </ul>
+      <div>
+        {" "}
+        <table className="table-auto">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">StoreID</th>
+              <th scope="col">StoreName</th>
+            </tr>
+          </thead>
+          <tbody>
+            {stores.map((store: any, i) => {
+              return (
+                <tr key={store.id}>
+                  <th scope="row">{i}</th>
+                  <td>{store.id}</td>
+                  <td>{store.name}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </Layout>
   );
 };

@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 
 export class AuthService {
-
   public get isLogin(): boolean {
     this.setToken(localStorage.getItem("token")); // Really I can't use window on server side??? TTTT TTTT
     //console.log(`Get token from authService.isLogin(): ${this.token}`);
@@ -24,13 +23,17 @@ export class AuthService {
 
   public async login(email, password) {
     var token = "";
+    var errorCode = "";
     var errorMsg = "";
 
     await axios({
       method: "post",
       url: "http://localhost:8000/api/auth/login",
       data: JSON.stringify({ email, password }),
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
     })
       .then(function (response) {
         token = response.data.token;
@@ -44,14 +47,15 @@ export class AuthService {
       })
       .catch(function (error) {
         if (error.response) {
-          errorMsg = error.response.status;
-          //console.log(`Reponse Error Status: ${error.response.status}`);
+          errorCode = error.response.status;
+          errorMsg = error.response.statusText;
+          console.log(`Reponse Error: ${error.response}`);
+          alert(`Unauthorized Code ${errorCode}: ${errorMsg}`);
         }
-        alert(`Unauthorized Code ${errorMsg}: Email or password is incorrect.`);
         //return [token, errorMsg];
       });
 
-    return [token, errorMsg];
+    return [token, errorCode];
   }
 
   public async getMe() {
@@ -59,7 +63,7 @@ export class AuthService {
     var data = null;
     var errorMsg = "";
     await axios
-      .get(("http://127.0.0.1:8000/api/auth/me"), {
+      .get("http://127.0.0.1:8000/api/auth/me", {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json",
@@ -108,5 +112,4 @@ export class AuthService {
       });
     return errorMsg;
   }
-
 }

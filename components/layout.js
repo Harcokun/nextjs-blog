@@ -4,23 +4,34 @@ import styles from "./layout.module.css";
 import utilStyles from "../styles/utils.module.css";
 import Link from "next/link";
 import { useContainer } from "../services/containerProvider";
+import { useEffect, useState } from "react";
 
 export const siteTitle = "Next.js Sample Website";
 
 export default function Layout({ children, home }) {
   const { authService, userService } = useContainer();
-  var username = ""; 
+  //var username = "";
+  const [username, setUsername] = useState("");
 
   //const username = await userService.getUsername() //I should use useEffect to initialize things
 
-  userService.getUserName().then((result) => {
-    username = result;
-    console.log(`Username 1: ${username}`);
-  });
-  console.log(`Username 2: ${username}`);
+  const callUserName = async () => {
+    const name = await userService.getUserName();
+    setUsername(name);
+  };
+
+  useEffect(() => {
+    callUserName();
+  }, []);
+
+  // userService.getUserName().then((result) => {
+  //   username = result;
+  //   //console.log(`Username 1: ${username}`);
+  // });
+  // //console.log(`Username 2: ${username}`);
 
   const name = authService.isLogin ? username : "Welcome to Test System";
-  console.log(`Name: ${name}`);
+  //console.log(`Name: ${name}`);
 
   return (
     <div className="max-w-xl px-4 mt-12 mx-auto mb-24">
